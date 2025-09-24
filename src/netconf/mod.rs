@@ -59,6 +59,7 @@ impl NETCONFClient {
                 capability: vec!["urn:ietf:params:netconf:base:1.0".to_owned()],
             },
             namespace: None,
+            namespace_junos: None,
             session_id: None,
         };
         let hello_xml = to_string(&hello)?;
@@ -264,6 +265,7 @@ impl NETCONFClient {
             match result {
                 RPCReplyCommand::ConfigurationInformation {
                     configuration_output,
+                    ..
                 } => {
                     diff_result = Some(configuration_output);
                 }

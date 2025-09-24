@@ -12,6 +12,9 @@ pub struct Hello {
     pub session_id: Option<String>,
     #[serde(rename = "@xmlns")]
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub namespace_junos: Option<String>,
+    #[serde(rename = "@xmlns:nc")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub namespace: Option<String>,
 }
 
@@ -110,6 +113,12 @@ pub enum RPCReplyCommand {
 
     #[serde(rename = "configuration-information")]
     ConfigurationInformation {
+        #[serde(rename = "@format")]
+        format: Option<String>,
+        #[serde(rename = "@rollback")]
+        rollback: Option<String>,
+        #[serde(rename = "@compare")]
+        compare: Option<String>,
         #[serde(rename = "configuration-output")]
         configuration_output: String,
     },
@@ -127,6 +136,10 @@ pub enum RPCReplyCommand {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct LoadConfigurationResults {
+    #[serde(rename = "@format")]
+    pub format: Option<String>,
+    #[serde(rename = "@action")]
+    pub action: Option<String>,
     #[serde(rename = "$value")]
     pub load_configuration_results: Vec<LoadConfigurationResultsEnum>,
 }
@@ -171,7 +184,7 @@ impl Display for RPCReplyCommand {
                 write!(f, "{}", text)
             }
             RPCReplyCommand::ConfigurationInformation {
-                configuration_output: configuration_information,
+                configuration_output: configuration_information, ..
             } => {
                 write!(f, "{}", configuration_information)
             }
