@@ -257,6 +257,7 @@ impl NETCONFClient {
                 format: format,
                 rollback: Some("0".to_string()),
                 compare: Some("rollback".to_string()),
+                source: None,
             },
         };
         let _ = self.send_rpc(c)?;
@@ -268,6 +269,34 @@ impl NETCONFClient {
                     ..
                 } => {
                     diff_result = Some(configuration_output);
+                }
+                other => return Err(NETCONFError::UnexpectedCommand(other)),
+            }
+        }
+        diff_result.ok_or(NETCONFError::MissingOk)
+    }
+
+    pub fn get_configuration(&mut self, format: String, source: String) -> NETCONFResult<String> {
+        let c = RPC {
+            rpc: RPCCommand::GetConfiguration {
+                format: format,
+                rollback: None,
+                compare: None,
+                source: Some(source),
+            },
+        };
+        let _ = self.send_rpc(c)?;
+        let mut diff_result = None;
+        for result in self.read_result()? {
+            match result {
+                RPCReplyCommand::ConfigurationText {
+                    text,
+                    ..
+                } => {
+                    diff_result = Some(text);
+                }
+                RPCReplyCommand::Other(text) => {
+                    diff_result = Some(text);
                 }
                 other => return Err(NETCONFError::UnexpectedCommand(other)),
             }

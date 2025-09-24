@@ -65,6 +65,14 @@ enum Commands {
 
     /// Loads local configuration onto router and shows a diff
     Check { local_file: String },
+
+    /// Get
+    Get {
+        #[clap(value_enum)]
+        format: Format,
+
+        source: String,
+    }
 }
 
 fn main() {
@@ -193,6 +201,16 @@ fn main() {
                 println!("{}", diff_reply);
             }
             let _ = netconf_session.unlock_configuration().unwrap();
+        }
+        Commands::Get { format, source } => {
+            let format_str = match format {
+                Format::Text => "text",
+                Format::JSON => "json",
+            };
+            let diff_reply = netconf_session
+                .get_configuration(format_str.to_string(), source)
+                .unwrap();
+            println!("{}", diff_reply);
         }
     }
 }

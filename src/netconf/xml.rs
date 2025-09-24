@@ -41,10 +41,16 @@ pub enum RPCCommand {
         format: String,
 
         #[serde(rename = "@rollback")]
+        #[serde(skip_serializing_if = "Option::is_none")]
         rollback: Option<String>,
 
         #[serde(rename = "@compare")]
+        #[serde(skip_serializing_if = "Option::is_none")]
         compare: Option<String>,
+
+        #[serde(rename = "@source")]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        source: Option<String>,
     },
     #[serde(rename = "command")]
     Command {
@@ -123,6 +129,15 @@ pub enum RPCReplyCommand {
         configuration_output: String,
     },
 
+    #[serde(rename = "configuration-text")]
+    ConfigurationText {
+        #[serde(rename = "$text")]
+        text: String,
+        #[serde(rename = "@xmlns")]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        namespace: Option<String>,
+    },
+
     #[serde(rename = "rpc-error")]
     RPCError(RPCError),
 
@@ -187,6 +202,9 @@ impl Display for RPCReplyCommand {
                 configuration_output: configuration_information, ..
             } => {
                 write!(f, "{}", configuration_information)
+            }
+            RPCReplyCommand::ConfigurationText { text, namespace: _namespace } => {
+                write!(f, "{}", text)
             }
             RPCReplyCommand::Ok => {
                 write!(f, "Executed Successfully!")
