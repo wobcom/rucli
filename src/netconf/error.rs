@@ -15,6 +15,8 @@ pub enum NETCONFError {
     UnexpectedCommand(RPCReplyCommand),
     #[error("{0}")]
     RpcError(#[from] RPCError),
+    #[error("{0}")]
+    SeError(#[from] quick_xml::SeError),
 }
 
 pub type NETCONFResult<T> = Result<T, NETCONFError>;
