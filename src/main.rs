@@ -20,7 +20,7 @@ struct Cli {
     #[arg(long, short, env)]
     password: Option<String>,
 
-    #[arg(long, short, action=ArgAction::SetTrue)]
+    #[arg(long, action=ArgAction::SetTrue)]
     debug: bool,
 
     #[arg(long, short, action=ArgAction::SetTrue)]

@@ -133,6 +133,10 @@ pub enum RPCReplyCommand {
     ConfigurationText {
         #[serde(rename = "$text")]
         text: String,
+        #[serde(rename = "@format")]
+        format: Option<String>,
+        #[serde(rename = "@source")]
+        source: Option<String>,
         #[serde(rename = "@xmlns")]
         #[serde(skip_serializing_if = "Option::is_none")]
         namespace: Option<String>,
@@ -203,7 +207,7 @@ impl Display for RPCReplyCommand {
             } => {
                 write!(f, "{}", configuration_information)
             }
-            RPCReplyCommand::ConfigurationText { text, namespace: _namespace } => {
+            RPCReplyCommand::ConfigurationText { text, namespace: _namespace, format: _format, source: _source } => {
                 write!(f, "{}", text)
             }
             RPCReplyCommand::Ok => {
