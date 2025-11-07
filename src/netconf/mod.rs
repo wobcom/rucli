@@ -173,6 +173,7 @@ impl NETCONFClient {
                     }
                 }
                 RPCReplyCommand::Other(_) => {} // ???
+                RPCReplyCommand::CommitResults(_cr) => ok = Some(()),
                 RPCReplyCommand::Ok => ok = Some(()),
                 other => return Err(NETCONFError::UnexpectedCommand(other)),
             }

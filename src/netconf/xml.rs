@@ -84,7 +84,9 @@ pub enum RPCCommand {
     },
 
     #[serde(rename = "commit-configuration")]
-    CommitConfiguration {},
+    CommitConfiguration {
+
+    },
 
     #[serde(rename = "commit-configuration")]
     CommitConfirmedConfiguration {
@@ -113,6 +115,9 @@ pub enum RPCReplyCommand {
         #[serde(rename = "$text")]
         text: String,
     },
+
+    #[serde(rename = "commit-results")]
+    CommitResults(CommitResults),
 
     #[serde(rename = "load-configuration-results")]
     LoadConfigurationResults(LoadConfigurationResults),
@@ -178,6 +183,61 @@ pub enum LoadConfigurationResultsEnum {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
+pub struct CommitResults {
+    #[serde(rename = "@format")]
+    pub format: Option<String>,
+    #[serde(rename = "@action")]
+    pub action: Option<String>,
+    #[serde(rename = "$value")]
+    pub commit_results: Vec<CommitResultsEnum>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommitResultRevisionInformation {
+    #[serde(rename = "old-db-revision")]
+    pub new_ref: String,
+
+    #[serde(rename = "new-db-revision")]
+    pub old_ref: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommitResultRoutingEngine {
+    pub name: String,
+
+    #[serde(rename = "@style")]
+    pub style: Option<String>,
+
+    #[serde(rename = "commit-success")]
+    pub commit_success: Option<String>,
+
+    #[serde(rename = "commit-check-success")]
+    pub commit_check_success: Option<String>,
+
+    #[serde(rename = "commit-revision-information")]
+    pub commit_results: Option<CommitResultRevisionInformation>,
+}
+
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub enum CommitResultsEnum {
+    #[serde(rename = "ok")]
+    Ok,
+
+    #[serde(rename = "rpc-error")]
+    RPCError(RPCError),
+
+    #[serde(rename = "routing-engine")]
+    RoutingEngine(CommitResultRoutingEngine)
+
+}
+
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct LoadErrorCount {
     #[serde(rename = "$text")]
     message: String,
@@ -228,6 +288,21 @@ impl Display for RPCReplyCommand {
                         LoadConfigurationResultsEnum::LoadErrorCount(l)=> {
                             writeln!(f, "{:?}", l)?;
                         }
+                    }
+                }
+
+                Ok(())
+            }
+            RPCReplyCommand::CommitResults(x) => {
+                for elem in &x.commit_results {
+                    match elem {
+                        CommitResultsEnum::Ok => {
+                            writeln!(f, "{}", "Success!")?;
+                        }
+                        CommitResultsEnum::RPCError(error) => {
+                            writeln!(f, "{}", error)?;
+                        }
+                        _ => {}
                     }
                 }
 
