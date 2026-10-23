@@ -8,6 +8,7 @@ pub mod xml;
 
 use crate::netconf::error::NETCONFError;
 use crate::netconf::xml::LoadConfigurationResultsEnum;
+use crate::netconf::xml::CommitResultsEnum;
 use crate::netconf::xml::RPCReplyCommand;
 use crate::netconf::xml::RPC;
 
@@ -173,7 +174,21 @@ impl NETCONFClient {
                     }
                 }
                 RPCReplyCommand::Other(_) => {} // ???
-                RPCReplyCommand::CommitResults(_cr) => ok = Some(()),
+                RPCReplyCommand::CommitResults(commit_results) => {
+                    for cr in commit_results.commit_results {
+                        match cr {
+                            CommitResultsEnum::RPCError(error) => {
+                                if error.error_severity == "warning" {
+                                    eprintln!("{}", error);
+                                } else {
+                                    return Err(error.into());
+                                }
+                            }
+                            CommitResultsEnum::Ok => ok = Some(()),
+                            CommitResultsEnum::RoutingEngine(_) => {}, // ???
+                        }
+                    }
+                }
                 RPCReplyCommand::Ok => ok = Some(()),
                 other => return Err(NETCONFError::UnexpectedCommand(other)),
             }
