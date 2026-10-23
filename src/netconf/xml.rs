@@ -337,6 +337,8 @@ pub struct RPCError {
 pub struct RPCErrorInfo {
     #[serde(rename = "bad-element")]
     pub bad_element: String,
+    #[serde(rename = "source-daemon")]
+    pub source_daemon: Option<String>,
 }
 
 impl Display for RPCError {
